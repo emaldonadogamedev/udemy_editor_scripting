@@ -21,6 +21,38 @@ public class MissingReferencesDetector : EditorWindow
 
     public void OnGUI()
     {
+        EditorGUILayout.Space();
+        if(GUILayout.Button("Find Missing References"))
+        {
+            GameObject[] gameObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
 
+            foreach(var gameObject in gameObjects)
+            {
+                Component[] components = gameObject.GetComponents<Component>();
+
+                foreach(var component in components)
+                {
+                    SerializedObject serializedObject = new SerializedObject(component);
+                    SerializedProperty serializedProperty = serializedObject.GetIterator();
+
+                    while (serializedProperty.NextVisible(true))
+                    {
+                        if(serializedProperty.propertyType == SerializedPropertyType.ObjectReference)
+                        {
+                            if(serializedProperty.objectReferenceValue == null)
+                            {
+                                Debug.Log("<color=red><b>Missing Reference: </b></color>" +
+                                    serializedProperty.displayName + " on " +
+                                    gameObject.name,
+                                    gameObject);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        EditorGUILayout.Space();
+        Repaint();
     }
 }
