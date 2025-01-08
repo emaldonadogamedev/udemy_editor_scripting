@@ -23,6 +23,8 @@ public class CustomHierarchyOptions
         DrawZoomInButton(id, rect, "Frame this game object");
 
         DrawPrefabButton(id, rect, "save as prefab");
+
+        DrawDeleteButton(id, rect, "delete GameObject from Hierarchy");
     }
 
     static void DrawActiveToggleButton(int id, Rect rect)
@@ -64,7 +66,7 @@ public class CustomHierarchyOptions
         if (gameObject == null)
             return;
 
-        GUIStyle guiStyle = new GUIStyle();
+        GUIStyle guiStyle = new();
         guiStyle.fixedWidth = 0f;
         guiStyle.fixedHeight = 0f;
         guiStyle.stretchWidth = true;
@@ -73,7 +75,7 @@ public class CustomHierarchyOptions
         Rect rect = GetDrawRect(x, y, size);
         Texture texture = Resources.Load(textureName) as Texture;
 
-        GUIContent guiContent = new GUIContent();
+        GUIContent guiContent = new();
         guiContent.image = texture;
         guiContent.text = string.Empty;
         guiContent.tooltip = tooltip;
@@ -178,6 +180,27 @@ public class CustomHierarchyOptions
 
                 // to shwo the prefab once created and saved
                 EditorGUIUtility.PingObject(prefab);
+            },
+            gameObject,
+            tooltip);
+    }
+
+    static void DrawDeleteButton(int id, Rect rect, string tooltip)
+    {
+        GameObject gameObject =
+            EditorUtility.InstanceIDToObject(id) as GameObject;
+
+        if (gameObject == null)
+            return;
+
+        DrawButtonWithTexture(
+            rect.x + 225f,
+            rect.y + 2f,
+            14f,
+            "delete_icon",
+            () =>
+            {
+                UnityEngine.Object.DestroyImmediate(gameObject);
             },
             gameObject,
             tooltip);
