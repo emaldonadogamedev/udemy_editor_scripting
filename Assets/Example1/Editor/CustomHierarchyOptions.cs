@@ -19,6 +19,10 @@ public class CustomHierarchyOptions
 
         AddGameObjectInfoScriptToGameObject(id);
         DrawInfoButton(id, rect, string.Empty);
+
+        DrawZoomInButton(id, rect, "Frame this game object");
+
+        DrawPrefabButton(id, rect, "save as prefab");
     }
 
     static void DrawActiveToggleButton(int id, Rect rect)
@@ -112,9 +116,70 @@ public class CustomHierarchyOptions
 
         if (gameObject == null)
             return;
+
         if (!gameObject.TryGetComponent<GameObjectInfo>(out _))
         {
             gameObject.AddComponent<GameObjectInfo>();
         }
+    }
+
+    static void DrawZoomInButton(int id, Rect rect, string tooltip)
+    {
+        GameObject gameObject =
+            EditorUtility.InstanceIDToObject(id) as GameObject;
+
+        if (gameObject == null)
+            return;
+
+        DrawButtonWithTexture(
+            rect.x + 175f,
+            rect.y + 2,
+            14,
+            "zoom_in_icon",
+            () =>
+            {
+                Selection.activeGameObject = gameObject;
+                SceneView.FrameLastActiveSceneView();
+            },
+            gameObject,
+            tooltip);
+    }
+
+    static void DrawPrefabButton(int id, Rect rect, string tooltip)
+    {
+        GameObject gameObject =
+            EditorUtility.InstanceIDToObject(id) as GameObject;
+
+        if (gameObject == null)
+            return;
+
+        DrawButtonWithTexture(
+            rect.x + 198f,
+            rect.y,
+            18,
+            "prefab_icon",
+            () =>
+            {
+                const string pathToPrefabsFolder = "Assets/Prefabs";
+
+                bool doesPrefabsFolderExist =
+                    AssetDatabase.IsValidFolder(pathToPrefabsFolder);
+
+                if (!doesPrefabsFolderExist)
+                    AssetDatabase.CreateFolder("Assets","Prefabs");
+
+                string prefabName = $"{gameObject.name}.prefab";
+                string prefabPath = $"{pathToPrefabsFolder}/{prefabName}";
+
+                // to delete it, if it already exists
+                AssetDatabase.DeleteAsset(prefabName);
+
+                GameObject prefab = PrefabUtility.SaveAsPrefabAsset(gameObject, prefabPath);
+
+                // to shwo the prefab once created and saved
+                EditorGUIUtility.PingObject(prefab);
+            },
+            gameObject,
+            tooltip);
     }
 }
