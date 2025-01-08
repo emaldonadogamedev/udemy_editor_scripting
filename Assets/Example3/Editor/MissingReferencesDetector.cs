@@ -1,16 +1,26 @@
+using UnityEditor;
 using UnityEngine;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class MissingReferencesDetector : EditorWindow
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [MenuItem("Window/Missing References")]
+    public static void ShowWindow()
     {
-        
+        var window = GetWindow<MissingReferencesDetector>();
+
+        window.maxSize = new Vector2(250f, 100f);
+        window.minSize = window.maxSize;
+
+        var guiContent = new GUIContent
+        {
+            text = "Find Missing References"
+        };
+        window.titleContent = guiContent;
+        window.Show();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnGUI()
     {
-        
+
     }
 }
