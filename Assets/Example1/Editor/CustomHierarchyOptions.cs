@@ -11,9 +11,24 @@ public class CustomHierarchyOptions
             HierarchyWindowItemOnGUI;
     }
 
+    static string gameObjectName;
+    public static bool IsFavorited
+    {
+        get { return EditorPrefs.GetBool("favorite" + gameObjectName, false); }
+        set { EditorPrefs.SetBool("favorite" + gameObjectName, value); }
+    }
+
     static void HierarchyWindowItemOnGUI(int id, Rect rect)
     {
         Debug.Log("Editor script code called!");
+
+        GameObject gameObject =
+            EditorUtility.InstanceIDToObject(id) as GameObject;
+
+        if (gameObject == null)
+            return;
+
+        gameObjectName = gameObject.name;
 
         DrawActiveToggleButton(id, rect);
 
@@ -25,6 +40,8 @@ public class CustomHierarchyOptions
         DrawPrefabButton(id, rect, "save as prefab");
 
         DrawDeleteButton(id, rect, "delete GameObject from Hierarchy");
+
+        DrawFavoriteButton(id, rect, "Add to Favorites");
     }
 
     static void DrawActiveToggleButton(int id, Rect rect)
@@ -82,7 +99,7 @@ public class CustomHierarchyOptions
 
 
         bool isClicked = GUI.Button(rect, guiContent, guiStyle);
-        if(isClicked)
+        if (isClicked)
         {
             action.Invoke();
         }
@@ -96,7 +113,7 @@ public class CustomHierarchyOptions
         if (gameObject == null)
             return;
 
-        if(gameObject.TryGetComponent<GameObjectInfo>(out var gameObjectInfo))
+        if (gameObject.TryGetComponent<GameObjectInfo>(out var gameObjectInfo))
         {
             tooltip = gameObjectInfo.GameObjectInfoText;
         }
@@ -168,7 +185,7 @@ public class CustomHierarchyOptions
                     AssetDatabase.IsValidFolder(pathToPrefabsFolder);
 
                 if (!doesPrefabsFolderExist)
-                    AssetDatabase.CreateFolder("Assets","Prefabs");
+                    AssetDatabase.CreateFolder("Assets", "Prefabs");
 
                 string prefabName = $"{gameObject.name}.prefab";
                 string prefabPath = $"{pathToPrefabsFolder}/{prefabName}";
@@ -204,5 +221,45 @@ public class CustomHierarchyOptions
             },
             gameObject,
             tooltip);
+    }
+
+    static void DrawFavoriteButton(int id, Rect rect, string tooltip)
+    {
+        GameObject gameObject =
+            EditorUtility.InstanceIDToObject(id) as GameObject;
+
+        if (gameObject == null)
+            return;
+
+        if(IsFavorited)
+        {
+            DrawButtonWithTexture(
+                rect.x + 125,
+                rect.y + 3,
+                10f,
+                "favorite_filled",
+                () =>
+                {
+
+                },
+                gameObject,
+                tooltip);
+        }
+        else
+        {
+            DrawButtonWithTexture(
+                rect.x + 125,
+                rect.y + 3,
+                10f,
+                "favorite_outline",
+                () =>
+                {
+                    IsFavorited = !IsFavorited;
+
+                    FavoritesMenu.AddToFavorites(gameObject);
+                },
+                gameObject,
+                tooltip);
+        }
     }
 }

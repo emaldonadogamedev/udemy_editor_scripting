@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 public class ProjectOrganizerWindow : EditorWindow
 {
@@ -83,6 +84,15 @@ public class ProjectOrganizerWindow : EditorWindow
             }
 
             DrawAddAndRemoveControls();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            if(GUILayout.Button("Organize"))
+            {
+                OrganizeFilesIntoFolders();
+            }
 
         }
         else
@@ -307,5 +317,37 @@ public class ProjectOrganizerWindow : EditorWindow
         }
 
         GUILayout.EndHorizontal();
+    }
+
+    private void OrganizeFilesIntoFolders()
+    {
+        Dictionary<string, string> fileExtentionsToFolderPathsMap = new();
+
+        foreach (string assetTypeName in assetTypes.Keys)
+        {
+            for(int i = 0; i < assetTypes[assetTypeName].Count; i++)
+            {
+                string folderPath = "Assets/" + assetTypeName + "/";
+                fileExtentionsToFolderPathsMap.Add(
+                    assetTypes[assetTypeName][i],
+                    folderPath);
+            }
+        }
+
+        DirectoryInfo directory = new("Assets/");
+        foreach(string fileExtension in fileExtentionsToFolderPathsMap.Keys)
+        {
+            string query = "*" + fileExtension;
+
+            FileInfo[] fileInfos = directory.GetFiles(query);
+
+            foreach(FileInfo fileInfo in fileInfos)
+            {
+                string filePath =
+                    fileExtentionsToFolderPathsMap[fileExtension] + fileInfo.Name;
+
+                AssetDatabase.MoveAsset("Assets/" + fileInfo.Name, filePath);
+            }
+        }
     }
 }
