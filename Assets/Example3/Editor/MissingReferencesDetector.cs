@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MissingReferencesDetector : EditorWindow
 {
-    [MenuItem("Window/Missing References")]
+    [MenuItem("Custom Tools/Missing References")]
     public static void ShowWindow()
     {
         var window = GetWindow<MissingReferencesDetector>();

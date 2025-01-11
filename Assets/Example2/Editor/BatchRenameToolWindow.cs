@@ -7,7 +7,7 @@ public class BatchRenameToolWindow : EditorWindow
     string batchNumber = string.Empty;
     bool showOptions = true;
 
-    [MenuItem("Window/Batch Rename")]
+    [MenuItem("Custom Tools/Batch Rename")]
     public static void ShowWindow()
     {
         var window = GetWindow<BatchRenameToolWindow>();
